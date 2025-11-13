@@ -74,13 +74,35 @@ convert -size 128x128 xc:'#667eea' icons/icon128.png
 
 ## 🧪 Testing & Debugging
 
-For comprehensive testing instructions, platform-specific debugging tips, and troubleshooting help, see **[TESTING.md](TESTING.md)**.
+### Quick Start
+See **[QUICK_START.md](QUICK_START.md)** for a 2-minute setup guide and quick testing instructions.
 
-Quick test:
-1. Load the extension
-2. Visit chat.openai.com
-3. Get a response from ChatGPT
-4. Look for "Check with GPTZero" button below the response
+### Testing Guides
+- **[QUICK_START.md](QUICK_START.md)** - Fast setup and basic testing (2 minutes)
+- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Comprehensive platform-by-platform testing checklist
+- **[TESTING.md](TESTING.md)** - Detailed debugging guide with platform-specific tips
+
+### Selector Verification Tool
+Run this in your browser console on any supported platform to verify selectors:
+```javascript
+// Copy and paste the contents of scripts/verify-selectors.js
+// Or load it directly from the file
+```
+
+This tool will:
+- ✅ Detect which platform you're on
+- ✅ Test all selectors for that platform
+- ✅ Show what's found and what's missing
+- ✅ Provide recommendations
+
+### Quick Test (ChatGPT)
+1. Load the extension in Chrome
+2. Visit https://chat.openai.com/
+3. Open DevTools (F12) → Console tab
+4. Look for: `Fast GPTZero: ChatGPT content script loaded`
+5. Ask ChatGPT a question
+6. Look for purple "Check with GPTZero" button below response
+7. Click button and watch the magic! ✨
 
 ## 📖 Usage
 
