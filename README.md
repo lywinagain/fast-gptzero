@@ -1,318 +1,146 @@
 # Fast GPTZero 🤖✓
 
-A Chrome extension that automatically checks AI-generated responses using GPTZero's web interface. No API key required!
+Chrome extension that automatically checks AI responses using GPTZero. No API key needed!
 
-## 🌟 Features
+## Features
 
-- **One-Click AI Detection**: Add a "Check with GPTZero" button to all AI response messages
-- **Automated Workflow**: Automatically opens GPTZero, pastes text, and extracts results
-- **Multi-Platform Support**: Works with ChatGPT, Claude, Gemini, and Grok
-- **Result Display**: Beautiful modal showing AI probability and classification
-- **Revision Requests**: Easily ask the AI to revise responses detected as AI-generated
-- **No API Key Needed**: Uses GPTZero's free web interface
+- ✅ Works on ChatGPT, Claude, Gemini, and Grok
+- ✅ One-click AI detection with percentage score
+- ✅ Automated GPTZero workflow
+- ✅ Request AI revisions based on results
+- ✅ No API key or signup required
 
-## 🚀 Supported Platforms
+## Quick Start
 
-- ✅ **ChatGPT** (chat.openai.com)
-- ✅ **Claude** (claude.ai)
-- ✅ **Gemini** (gemini.google.com)
-- ✅ **Grok** (grok.x.com)
-
-## 📦 Installation
-
-### Step 1: Clone or Download
-
-```bash
-git clone https://github.com/yourusername/fast-gptzero.git
-cd fast-gptzero
+### 1. Install Extension
 ```
-
-Or download as ZIP and extract.
-
-### Step 2: Load Extension (Placeholder icons included!)
-
-The repository now includes placeholder icons, so you can start testing immediately:
-
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable "Developer mode" (toggle in top-right)
+1. Open chrome://extensions/
+2. Enable "Developer mode"
 3. Click "Load unpacked"
-4. Select the `fast-gptzero` directory
-5. Extension is ready to use!
-
-**Optional: Create Better Icons**
-
-If you want proper icons instead of placeholders:
-
-#### Option A: Using the provided script (requires ImageMagick or Inkscape)
-
-```bash
-cd scripts
-./create-icons.sh
+4. Select fast-gptzero folder
 ```
 
-#### Option B: Manual creation
-
-1. Use an online converter like [CloudConvert](https://cloudconvert.com/svg-to-png)
-2. Upload `icons/icon.svg`
-3. Convert to these sizes and save in `icons/` directory:
-   - icon16.png (16x16)
-   - icon32.png (32x32)
-   - icon48.png (48x48)
-   - icon128.png (128x128)
-
-#### Option C: Quick placeholder (for testing)
-
-Create simple solid color PNG files with these commands:
-
-```bash
-# If you have ImageMagick:
-convert -size 16x16 xc:'#667eea' icons/icon16.png
-convert -size 32x32 xc:'#667eea' icons/icon32.png
-convert -size 48x48 xc:'#667eea' icons/icon48.png
-convert -size 128x128 xc:'#667eea' icons/icon128.png
+### 2. Test on ChatGPT
+```
+1. Go to https://chatgpt.com/
+2. Ask ChatGPT a question
+3. Click "Check with GPTZero" button
+4. View results in modal
 ```
 
-## 🧪 Testing & Debugging
+## Supported Platforms
 
-### Quick Start
-See **[QUICK_START.md](QUICK_START.md)** for a 2-minute setup guide and quick testing instructions.
+| Platform | URL |
+|----------|-----|
+| ChatGPT | https://chatgpt.com/ |
+| Gemini | https://gemini.google.com/app |
+| Claude | https://claude.ai/ |
+| Grok | https://grok.x.com/ |
+| GPTZero | https://gptzero.me/ |
 
-### Testing Guides
-- **[QUICK_START.md](QUICK_START.md)** - Fast setup and basic testing (2 minutes)
-- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Comprehensive platform-by-platform testing checklist
-- **[TESTING.md](TESTING.md)** - Detailed debugging guide with platform-specific tips
+## How It Works
 
-### Selector Verification Tool
-Run this in your browser console on any supported platform to verify selectors:
-```javascript
-// Copy and paste the contents of scripts/verify-selectors.js
-// Or load it directly from the file
-```
+1. Adds button below AI responses
+2. Extracts text when you click
+3. Opens GPTZero in background
+4. Auto-pastes and submits text
+5. Extracts detection score
+6. Shows results modal
+7. Optional: Request revision
 
-This tool will:
-- ✅ Detect which platform you're on
-- ✅ Test all selectors for that platform
-- ✅ Show what's found and what's missing
-- ✅ Provide recommendations
-
-### Quick Test (ChatGPT)
-1. Load the extension in Chrome
-2. Visit https://chat.openai.com/
-3. Open DevTools (F12) → Console tab
-4. Look for: `Fast GPTZero: ChatGPT content script loaded`
-5. Ask ChatGPT a question
-6. Look for purple "Check with GPTZero" button below response
-7. Click button and watch the magic! ✨
-
-## 📖 Usage
-
-### Basic Workflow
-
-1. **Visit an AI Platform**: Go to ChatGPT, Claude, Gemini, or Grok
-2. **Chat with the AI**: Get a response from the AI
-3. **Check the Response**: Click the "Check with GPTZero" button that appears below the AI's response
-4. **View Results**: A modal will show the AI detection score and classification
-5. **Request Revision** (optional): Click "Request Revision" to automatically ask the AI to rewrite more naturally
-
-### How It Works
-
-1. When you click "Check with GPTZero":
-   - The extension copies the AI response text
-   - Opens GPTZero in a background tab
-   - Automatically pastes and submits the text
-   - Extracts the detection results
-   - Shows you the results in a modal
-   - Closes the GPTZero tab
-
-2. The results show:
-   - **AI Probability**: Percentage likelihood the text is AI-generated
-   - **Classification**: Category (e.g., "Likely AI-generated")
-   - **Additional Details**: Any extra metrics from GPTZero
-
-3. If you want the AI to revise:
-   - Click "Request Revision"
-   - A prompt is automatically added to your input
-   - Send it to get a more human-sounding response
-
-## 🎨 User Interface
-
-### Button Styles
-
-- **Normal**: Purple gradient button
-- **Checking**: Pink/red gradient with spinner (during analysis)
-- **Checked**: Blue gradient (after getting results)
-
-### Result Modal
-
-The modal displays:
-- Large percentage score with color coding:
-  - 🔴 Red (>70%): High AI probability
-  - 🟢 Green (<30%): Low AI probability
-  - 🟣 Purple (30-70%): Medium probability
-- Classification label
-- Additional metrics (if available)
-- Action buttons (Close / Request Revision)
-
-## ⚙️ Technical Details
-
-### Architecture
+## Project Structure
 
 ```
 fast-gptzero/
-├── manifest.json                    # Extension configuration
+├── manifest.json              # Extension config
 ├── src/
-│   ├── background/
-│   │   └── service-worker.js       # Service worker (orchestrates automation)
-│   ├── content/
-│   │   ├── platforms/
-│   │   │   ├── chatgpt.js         # ChatGPT integration
-│   │   │   ├── claude.js          # Claude integration
-│   │   │   ├── gemini.js          # Gemini integration
-│   │   │   └── grok.js            # Grok integration
-│   │   └── gptzero.js             # GPTZero automation
-│   ├── popup/
-│   │   ├── popup.html             # Extension popup UI
-│   │   └── popup.js               # Popup functionality
-│   └── styles/
-│       └── content.css            # Shared styles
-├── icons/                          # Extension icons
-├── scripts/
-│   └── create-icons.sh           # Icon generation script
-├── TESTING.md                     # Comprehensive testing guide
-└── README.md                      # This file
+│   ├── background/            # Service worker
+│   ├── content/platforms/     # Platform scripts
+│   ├── popup/                 # Extension UI
+│   └── styles/                # CSS
+├── icons/                     # Extension icons
+├── scripts/                   # Helper scripts
+└── docs/                      # Documentation
 ```
 
-### How the Automation Works
+## Testing
 
-1. **Content Scripts**: Inject buttons into AI platform pages
-2. **Background Worker**: Coordinates the GPTZero automation
-3. **GPTZero Script**: Handles text injection and result extraction
-4. **Message Passing**: Chrome extension messaging API for communication
+See [docs/TESTING.md](docs/TESTING.md) for testing instructions.
 
-### Permissions
+Quick diagnostic (run in console):
+```javascript
+// Check if messages detected
+document.querySelectorAll('[data-message-author-role="assistant"]').length
 
-The extension requires these permissions:
+// Check if buttons added
+document.querySelectorAll('.fast-gptzero-button').length
+```
 
-- `activeTab`: To interact with the current tab
-- `tabs`: To create and manage tabs
-- `storage`: To store settings (future use)
-- `scripting`: To inject scripts for automation
+## Troubleshooting
 
-Host permissions for:
-- ChatGPT, Claude, Gemini, Grok (to add buttons)
-- GPTZero (to automate detection)
+**Button not appearing?**
+- Refresh page (Ctrl+Shift+R)
+- Check console for "content script loaded"
+- Reload extension at chrome://extensions/
 
-## 🐛 Troubleshooting
+**Extension not loading?**
+- Check version shows 1.0.2
+- Verify all files in src/ folder exist
+- Check for errors at chrome://extensions/
 
-### Button Not Appearing
+**GPTZero not working?**
+- Check if GPTZero tab opens
+- Switch to tab to see automation
+- Wait 30-60 seconds for results
 
-- **Refresh the page**: Try reloading the AI chat page
-- **Check extension is enabled**: Go to `chrome://extensions/` and ensure it's enabled
-- **Wait for messages to load**: The button appears after AI responses are fully rendered
+## Development
 
-### "Failed to communicate with extension"
+### File Structure
+- `src/content/platforms/` - One file per platform (ChatGPT, Claude, etc)
+- `src/background/service-worker.js` - GPTZero automation
+- `src/content/gptzero.js` - Result extraction
+- `manifest.json` - URLs and permissions
 
-- **Reload the extension**: Go to `chrome://extensions/` and click the reload icon
-- **Check console**: Open DevTools (F12) and check for errors
-
-### Results Not Showing
-
-- **GPTZero changes**: GPTZero may have updated their UI. Check the console for errors.
-- **Wait longer**: Some analyses take 20-30 seconds
-- **Check GPTZero manually**: Visit gptzero.me to ensure the service is working
-
-### Icons Not Loading
-
-- **Create icon files**: Follow the installation steps to create icon PNG files
-- **Check file names**: Ensure files are named exactly: `icon16.png`, `icon32.png`, `icon48.png`, `icon128.png`
-- **Check file location**: Icons must be in the `icons/` directory
-
-## 🔒 Privacy & Security
-
-- **No Data Collection**: This extension doesn't collect or store any data
-- **No External Servers**: All processing happens locally and on GPTZero's public website
-- **No API Keys**: Uses GPTZero's free web interface
-- **Open Source**: All code is visible and auditable
-
-## ⚠️ Limitations
-
-- **Rate Limits**: Subject to GPTZero's usage limits
-- **Web Interface Changes**: May break if GPTZero updates their website
-- **Detection Accuracy**: Results depend on GPTZero's detection accuracy
-- **Text Length**: Very short texts (<50 characters) cannot be analyzed
-- **No API Access**: This is a web automation tool, not an official API integration
-
-## 🛠️ Development
-
-### Project Structure
-
-- Content scripts run on AI platform pages
-- Background service worker orchestrates automation
-- GPTZero content script handles detection automation
-- Message passing coordinates between components
-
-### Testing
-
-1. Load the extension in developer mode
-2. Visit a supported AI platform
-3. Generate an AI response
-4. Click the "Check with GPTZero" button
-5. Verify results appear correctly
+### Updating Selectors
+If a platform changes their UI:
+1. Edit `src/content/platforms/[platform].js`
+2. Update the selectors array
+3. Reload extension
+4. Test on platform
 
 ### Debugging
-
-Enable verbose logging:
 ```javascript
-// Check browser console (F12) for logs prefixed with:
-// "Fast GPTZero:"
+// Run verification tool in console
+// Copy from scripts/verify-selectors.js
 ```
 
-## 📄 License
+## Technical Details
 
-MIT License - feel free to use and modify!
+- **Manifest Version**: 3
+- **Permissions**: activeTab, tabs, storage, scripting
+- **Content Scripts**: Injected per platform
+- **Background**: Service worker for automation
+- **No external dependencies**
 
-## 🤝 Contributing
+## Limitations
 
-Contributions welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Improve documentation
+- Uses GPTZero's free tier (rate limits apply)
+- Dependent on platform UI selectors (may break on updates)
+- Requires minimum 50 characters of text
+- Results depend on GPTZero's accuracy
 
-## 📧 Support
+## License
 
-If you encounter issues:
-1. Check the Troubleshooting section
-2. Look for errors in the browser console (F12)
-3. Open an issue on GitHub
+MIT
 
-## 🙏 Acknowledgments
+## Contributing
 
-- GPTZero for their AI detection service
-- The open-source community
-
-## ⚡ Quick Start Example
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/yourusername/fast-gptzero.git
-cd fast-gptzero
-
-# 2. Create icons (if you have ImageMagick)
-./create-icons.sh
-
-# 3. Load in Chrome
-# - Open chrome://extensions/
-# - Enable Developer mode
-# - Click "Load unpacked"
-# - Select the fast-gptzero folder
-
-# 4. Try it out!
-# - Go to chat.openai.com
-# - Chat with ChatGPT
-# - Click "Check with GPTZero" on any response
-```
+1. Test on platforms and report issues
+2. Update selectors when platforms change
+3. Improve extraction logic
+4. Add new platforms
 
 ---
 
-**Note**: This extension automates GPTZero's web interface and is not officially affiliated with GPTZero. Use responsibly and respect GPTZero's terms of service.
+**Version:** 1.0.2
+**Last Updated:** 2024-11-13
