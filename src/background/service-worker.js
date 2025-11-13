@@ -213,9 +213,39 @@ async function injectTextIntoGPTZero(tabId, text) {
           // Click the button
           setTimeout(() => {
             submitButton.click();
+
+            // After clicking submit, try to trigger Advanced Scan
+            setTimeout(() => {
+              // Look for Advanced Scan button/option
+              const advancedButtons = document.querySelectorAll('button, [role="button"], a');
+              for (const btn of advancedButtons) {
+                const text = btn.textContent.toLowerCase();
+                const ariaLabel = btn.getAttribute('aria-label')?.toLowerCase() || '';
+
+                if (text.includes('advanced') || text.includes('deep scan') ||
+                    text.includes('detailed') || ariaLabel.includes('advanced')) {
+                  console.log('Found Advanced Scan button, clicking...');
+                  btn.click();
+                  break;
+                }
+              }
+
+              // Also look for "Show all X sentences" or similar buttons to expand details
+              setTimeout(() => {
+                const expandButtons = document.querySelectorAll('button, [role="button"], a, summary');
+                for (const btn of expandButtons) {
+                  const text = btn.textContent.toLowerCase();
+                  if (text.includes('show all') || text.includes('view details') ||
+                      text.includes('sentences') || text.includes('expand')) {
+                    console.log('Found expand button, clicking...');
+                    btn.click();
+                  }
+                }
+              }, 2000);
+            }, 2000);
           }, 500);
 
-          return { success: true, message: 'Text injected and submitted' };
+          return { success: true, message: 'Text injected and submitted with Advanced Scan' };
         }
 
         return { success: true, message: 'Text injected but no submit button found' };

@@ -311,6 +311,57 @@ function handleRevisionRequest() {
   showToast('Revision request added to input', 'success');
 }
 
+// Handle sending selected sentences to chat
+function handleSendSelected() {
+  if (!lastCheckResult || !lastCheckResult.sentences) {
+    showToast('No sentences to send', 'error');
+    return;
+  }
+
+  const selectedSentences = [];
+  document.querySelectorAll('.fast-gptzero-sentence-checkbox:checked').forEach(checkbox => {
+    const index = parseInt(checkbox.id.replace('sentence-', ''));
+    const aiSentences = lastCheckResult.sentences.filter(s => s.aiGenerated);
+    if (aiSentences[index]) selectedSentences.push(aiSentences[index]);
+  });
+
+  if (selectedSentences.length === 0) {
+    showToast('No sentences selected', 'error');
+    return;
+  }
+
+  hideResultsModal();
+
+  const inputArea = document.querySelector('rich-textarea, [contenteditable="true"], textarea');
+  if (!inputArea) {
+    showToast('Could not find input area', 'error');
+    return;
+  }
+
+  const sentenceList = selectedSentences.map((s, idx) =>
+    `${idx + 1}. "${s.text}" (Confidence: ${s.confidence}${typeof s.confidence === 'string' && s.confidence.includes('%') ? '' : '%'})`
+  ).join('\n');
+
+  const prompt = `GPTZero detected ${selectedSentences.length} AI-generated sentence${selectedSentences.length > 1 ? 's' : ''} in your previous response:\n\n${sentenceList}\n\nPlease rewrite these sentences to sound more natural and human-like while preserving the meaning and accuracy.`;
+
+  if (inputArea.tagName === 'TEXTAREA' || inputArea.tagName === 'INPUT') {
+    inputArea.value = prompt;
+  } else {
+    inputArea.textContent = prompt;
+  }
+  inputArea.dispatchEvent(new Event('input', { bubbles: true }));
+  inputArea.focus();
+
+  showToast(`${selectedSentences.length} sentence${selectedSentences.length > 1 ? 's' : ''} sent to chat`, 'success');
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 // Format label for display
 function formatLabel(key) {
   return key

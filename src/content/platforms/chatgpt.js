@@ -209,25 +209,76 @@ function showResultsModal(results) {
   if (aiProbability >= 70) scoreClass = 'high-ai';
   else if (aiProbability <= 30) scoreClass = 'low-ai';
 
+  // Check if we have sentence-level data
+  const hasSentences = results.sentences && results.sentences.length > 0;
+  const aiSentenceCount = results.aiSentenceCount || results.sentences?.filter(s => s.aiGenerated).length || 0;
+
   modal.innerHTML = `
     <div class="fast-gptzero-modal-header">
       <h3 class="fast-gptzero-modal-title">GPTZero Results</h3>
       <button class="fast-gptzero-close" id="close-results">&times;</button>
     </div>
-    <div class="fast-gptzero-results">
-      <div class="fast-gptzero-score ${scoreClass}">${results.aiProbability}%</div>
-      <div class="fast-gptzero-label">${results.classification || 'AI Probability'}</div>
-      ${results.details ? `
-        <div class="fast-gptzero-details">
-          ${Object.entries(results.details).map(([key, value]) => `
-            <div class="fast-gptzero-detail-item">
-              <span class="fast-gptzero-detail-label">${formatLabel(key)}</span>
-              <span class="fast-gptzero-detail-value">${value}</span>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
+
+    ${hasSentences ? `
+    <div class="fast-gptzero-tabs">
+      <button class="fast-gptzero-tab active" data-tab="overview">Overview</button>
+      <button class="fast-gptzero-tab" data-tab="sentences">AI Sentences (${aiSentenceCount})</button>
     </div>
+    ` : ''}
+
+    <div class="fast-gptzero-tab-content active" id="tab-overview">
+      <div class="fast-gptzero-results">
+        <div class="fast-gptzero-score ${scoreClass}">${results.aiProbability}%</div>
+        <div class="fast-gptzero-label">${results.classification || 'AI Probability'}</div>
+        ${results.details ? `
+          <div class="fast-gptzero-details">
+            ${Object.entries(results.details).map(([key, value]) => `
+              <div class="fast-gptzero-detail-item">
+                <span class="fast-gptzero-detail-label">${formatLabel(key)}</span>
+                <span class="fast-gptzero-detail-value">${value}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+        ${hasSentences ? `
+          <div class="fast-gptzero-detail-item" style="margin-top: 16px;">
+            <span class="fast-gptzero-detail-label">AI Sentences Detected</span>
+            <span class="fast-gptzero-detail-value">${aiSentenceCount}</span>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+
+    ${hasSentences ? `
+    <div class="fast-gptzero-tab-content" id="tab-sentences">
+      <div class="fast-gptzero-sentences">
+        <div class="fast-gptzero-sentence-header">
+          <span class="fast-gptzero-sentence-title">AI-Generated Sentences</span>
+          <span class="fast-gptzero-sentence-count">${aiSentenceCount} detected</span>
+        </div>
+        ${results.sentences.filter(s => s.aiGenerated).map((sentence, idx) => `
+          <div class="fast-gptzero-sentence-item" data-index="${idx}">
+            <div style="display: flex; align-items: start; gap: 8px;">
+              <input type="checkbox" class="fast-gptzero-sentence-checkbox" id="sentence-${idx}" checked>
+              <label for="sentence-${idx}" style="flex: 1; cursor: pointer;">
+                <div class="fast-gptzero-sentence-text">${escapeHtml(sentence.text)}</div>
+                <div style="margin-top: 4px;">
+                  <span class="fast-gptzero-sentence-confidence">Confidence: ${sentence.confidence}${typeof sentence.confidence === 'number' || sentence.confidence.includes('%') ? '' : '%'}</span>
+                </div>
+              </label>
+            </div>
+            ${sentence.explanation ? `
+              <div class="fast-gptzero-sentence-explanation">${escapeHtml(sentence.explanation)}</div>
+            ` : ''}
+          </div>
+        `).join('')}
+        <button class="fast-gptzero-send-selected" id="send-selected">
+          Send Selected to Chat
+        </button>
+      </div>
+    </div>
+    ` : ''}
+
     <div class="fast-gptzero-actions">
       <button class="fast-gptzero-button-secondary" id="close-modal">Close</button>
       <button class="fast-gptzero-button-primary" id="request-revision">Request Revision</button>
@@ -240,10 +291,43 @@ function showResultsModal(results) {
   // Store results for revision
   lastCheckResult = results;
 
+  // Event listeners for tabs
+  if (hasSentences) {
+    document.querySelectorAll('.fast-gptzero-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Update active tab
+        document.querySelectorAll('.fast-gptzero-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        // Show corresponding content
+        const tabName = tab.getAttribute('data-tab');
+        document.querySelectorAll('.fast-gptzero-tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+      });
+    });
+
+    // Sentence item click to expand
+    document.querySelectorAll('.fast-gptzero-sentence-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        // Don't toggle if clicking checkbox
+        if (e.target.type === 'checkbox' || e.target.tagName === 'LABEL') return;
+
+        item.classList.toggle('expanded');
+      });
+    });
+
+    // Send selected sentences
+    const sendButton = document.getElementById('send-selected');
+    if (sendButton) {
+      sendButton.addEventListener('click', handleSendSelected);
+    }
+  }
+
   // Event listeners
   document.getElementById('close-results').addEventListener('click', hideResultsModal);
   document.getElementById('close-modal').addEventListener('click', hideResultsModal);
-  overlay.addEventListener('click', hideResultsModal);
   document.getElementById('request-revision').addEventListener('click', handleRevisionRequest);
 
   // Reset all buttons
@@ -285,6 +369,60 @@ function handleRevisionRequest() {
   inputArea.focus();
 
   showToast('Revision request added to input', 'success');
+}
+
+// Handle sending selected sentences to chat
+function handleSendSelected() {
+  if (!lastCheckResult || !lastCheckResult.sentences) {
+    showToast('No sentences to send', 'error');
+    return;
+  }
+
+  // Get selected sentences
+  const selectedSentences = [];
+  document.querySelectorAll('.fast-gptzero-sentence-checkbox:checked').forEach(checkbox => {
+    const index = parseInt(checkbox.id.replace('sentence-', ''));
+    const aiSentences = lastCheckResult.sentences.filter(s => s.aiGenerated);
+    if (aiSentences[index]) {
+      selectedSentences.push(aiSentences[index]);
+    }
+  });
+
+  if (selectedSentences.length === 0) {
+    showToast('No sentences selected', 'error');
+    return;
+  }
+
+  hideResultsModal();
+
+  // Find the input textarea
+  const inputArea = document.querySelector('textarea[placeholder*="Message"], #prompt-textarea, textarea');
+
+  if (!inputArea) {
+    showToast('Could not find input area', 'error');
+    return;
+  }
+
+  // Create prompt with selected sentences
+  const sentenceList = selectedSentences.map((s, idx) =>
+    `${idx + 1}. "${s.text}" (Confidence: ${s.confidence}${typeof s.confidence === 'string' && s.confidence.includes('%') ? '' : '%'})`
+  ).join('\n');
+
+  const prompt = `GPTZero detected ${selectedSentences.length} AI-generated sentence${selectedSentences.length > 1 ? 's' : ''} in your previous response:\n\n${sentenceList}\n\nPlease rewrite these sentences to sound more natural and human-like while preserving the meaning and accuracy.`;
+
+  // Set the value and trigger events
+  inputArea.value = prompt;
+  inputArea.dispatchEvent(new Event('input', { bubbles: true }));
+  inputArea.focus();
+
+  showToast(`${selectedSentences.length} sentence${selectedSentences.length > 1 ? 's' : ''} sent to chat`, 'success');
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 // Format label for display

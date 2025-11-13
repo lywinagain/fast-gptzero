@@ -63,6 +63,8 @@ function extractDetailedResults() {
     aiProbability: null,
     classification: null,
     details: {},
+    sentences: [],
+    aiSentenceCount: 0,
     timestamp: Date.now()
   };
 
@@ -124,7 +126,88 @@ function extractDetailedResults() {
       }
     }
 
-    // Method 4: Look for additional metrics
+    // Method 4: Extract sentence-level analysis (ADVANCED)
+    const sentenceElements = document.querySelectorAll(
+      '[class*="sentence"], [data-sentence], [class*="highlight"]'
+    );
+
+    console.log('Fast GPTZero: Found', sentenceElements.length, 'sentence elements');
+
+    sentenceElements.forEach((el, index) => {
+      const sentenceText = el.textContent.trim();
+
+      // Skip if too short or empty
+      if (sentenceText.length < 10) return;
+
+      // Look for confidence/probability indicators
+      let confidence = null;
+      let isAI = false;
+
+      // Check for data attributes
+      const aiScore = el.getAttribute('data-ai-score') || el.getAttribute('data-confidence');
+      if (aiScore) {
+        confidence = aiScore;
+        isAI = parseFloat(aiScore) > 50;
+      }
+
+      // Check for color/styling that indicates AI detection
+      const bgColor = window.getComputedStyle(el).backgroundColor;
+      const color = window.getComputedStyle(el).color;
+      const classList = el.className.toLowerCase();
+
+      // GPTZero typically highlights AI sentences with specific classes
+      if (classList.includes('highlight') || classList.includes('ai') ||
+          classList.includes('detected') || classList.includes('risky')) {
+        isAI = true;
+
+        // Try to find confidence nearby
+        const parent = el.closest('[class*="sentence-container"], [class*="analysis"]');
+        if (parent) {
+          const confidenceEl = parent.querySelector('[class*="confidence"], [class*="score"], [class*="probability"]');
+          if (confidenceEl) {
+            const confMatch = confidenceEl.textContent.match(/(\d+(?:\.\d+)?)%/);
+            if (confMatch) confidence = confMatch[1];
+          }
+        }
+      }
+
+      // Look for explanation nearby
+      let explanation = null;
+      const parentContainer = el.closest('[class*="container"], [class*="item"], [class*="row"]');
+      if (parentContainer) {
+        const explanationEl = parentContainer.querySelector(
+          '[class*="explanation"], [class*="reason"], [class*="detail"], [class*="description"]'
+        );
+        if (explanationEl && explanationEl !== el) {
+          explanation = explanationEl.textContent.trim();
+        }
+      }
+
+      // If this looks like an AI sentence, add it
+      if (isAI || confidence) {
+        results.sentences.push({
+          text: sentenceText,
+          confidence: confidence || 'High',
+          aiGenerated: isAI,
+          explanation: explanation || 'Exhibits patterns typical of AI-generated text',
+          index: index
+        });
+
+        if (isAI) results.aiSentenceCount++;
+      }
+    });
+
+    // Method 5: Look for sentence count in text (e.g., "11 AI sentences detected")
+    const sentenceCountMatch = bodyText.match(/(\d+)\s*(?:AI|risky)?\s*sentences?/i);
+    if (sentenceCountMatch) {
+      const count = parseInt(sentenceCountMatch[1]);
+      if (count > 0) {
+        results.aiSentenceCount = count;
+        console.log('Fast GPTZero: Found sentence count:', count);
+      }
+    }
+
+    // Method 6: Look for additional metrics
     const metricElements = document.querySelectorAll('[class*="metric"], [class*="stat"], [class*="detail"]');
 
     metricElements.forEach(el => {
@@ -139,7 +222,7 @@ function extractDetailedResults() {
       }
     });
 
-    // Method 5: Check if analysis is still loading
+    // Method 7: Check if analysis is still loading
     const loadingIndicators = document.querySelectorAll(
       '[class*="loading"], [class*="spinner"], [class*="analyzing"], [class*="processing"]'
     );
@@ -150,8 +233,7 @@ function extractDetailedResults() {
       results.message = 'Analysis in progress...';
     }
 
-    // Method 6: Look for results in specific GPTZero UI elements
-    // Check for result cards or panels
+    // Method 8: Look for results in specific GPTZero UI elements
     const resultCards = document.querySelectorAll('[class*="result-card"], [class*="result-panel"], [class*="detection-result"]');
 
     if (resultCards.length > 0) {
@@ -182,6 +264,40 @@ function extractDetailedResults() {
       });
     }
 
+    // Method 9: Try alternative sentence extraction from list items or table rows
+    if (results.sentences.length === 0) {
+      const listItems = document.querySelectorAll('li, tr, [role="listitem"]');
+
+      listItems.forEach((item, index) => {
+        const text = item.textContent.trim();
+
+        // Look for patterns like "Sentence: ... | Confidence: 95%"
+        const sentenceMatch = text.match(/(.+?)(?:\||confidence|score|probability)/i);
+        const confidenceMatch = text.match(/(\d+(?:\.\d+)?)%/);
+
+        if (sentenceMatch && text.length > 20) {
+          const sentenceText = sentenceMatch[1].trim();
+          const confidence = confidenceMatch ? confidenceMatch[1] : null;
+
+          // Check if marked as AI
+          const isAI = text.toLowerCase().includes('ai') ||
+                       (confidence && parseFloat(confidence) > 70);
+
+          if (isAI || confidence) {
+            results.sentences.push({
+              text: sentenceText,
+              confidence: confidence || 'High',
+              aiGenerated: isAI,
+              explanation: 'Flagged by GPTZero detection algorithm',
+              index: index
+            });
+
+            if (isAI) results.aiSentenceCount++;
+          }
+        }
+      });
+    }
+
     // If we found a percentage but no classification, infer it
     if (results.found && results.aiProbability && !results.classification) {
       const prob = parseFloat(results.aiProbability);
@@ -201,7 +317,10 @@ function extractDetailedResults() {
       results.details = null;
     }
 
+    // Log summary
     console.log('Fast GPTZero: Final results', results);
+    console.log('Fast GPTZero: Extracted', results.sentences.length, 'sentences');
+    console.log('Fast GPTZero: AI sentence count:', results.aiSentenceCount);
 
   } catch (error) {
     console.error('Fast GPTZero: Error extracting results', error);
