@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "Fast GPTZero",
+  "version": "1.0.2",
+  "description": "Automatically check AI responses with GPTZero and get revision suggestions",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://grok.x.com/*",
+    "https://x.com/*",
+    "https://gptzero.me/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chat.openai.com/*", "https://chatgpt.com/*"],
+      "js": ["src/content/platforms/chatgpt.js"],
+      "css": ["src/styles/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://claude.ai/*"],
+      "js": ["src/content/platforms/claude.js"],
+      "css": ["src/styles/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gemini.google.com/*"],
+      "js": ["src/content/platforms/gemini.js"],
+      "css": ["src/styles/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://grok.x.com/*", "https://x.com/*"],
+      "js": ["src/content/platforms/grok.js"],
+      "css": ["src/styles/content.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://gptzero.me/*"],
+      "js": ["src/content/gptzero.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

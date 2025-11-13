@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fast GPTZero - Testing Assistant</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 32px; margin-bottom: 10px; }
+        .content { padding: 40px; }
+        .section { margin-bottom: 40px; }
+        .section h2 { color: #667eea; margin-bottom: 20px; font-size: 24px; }
+        .platform-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+        .platform-card h3 { color: #333; margin-bottom: 10px; }
+        .platform-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            margin: 10px 10px 10px 0;
+            transition: transform 0.2s;
+        }
+        .platform-link:hover { transform: translateY(-2px); }
+        .checklist {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        .checklist-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .checklist-item:last-child { border-bottom: none; }
+        .checkbox { width: 20px; height: 20px; cursor: pointer; }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .priority-high { background: #ffe5e5; color: #d32f2f; }
+        .priority-medium { background: #fff3e0; color: #f57c00; }
+        .alert {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Fast GPTZero Testing Assistant</h1>
+            <p>Step-by-step guide to test the extension</p>
+        </div>
+
+        <div class="content">
+            <div class="alert">
+                <strong>📋 Before Starting:</strong> Load extension at chrome://extensions/ (version 1.0.2)
+            </div>
+
+            <div class="section">
+                <h2>🎯 Test These Platforms</h2>
+
+                <div class="platform-card">
+                    <h3>1. ChatGPT <span class="status-badge priority-high">START HERE</span></h3>
+                    <a href="https://chatgpt.com/" target="_blank" class="platform-link">🔗 Open ChatGPT (NEW)</a>
+                    <a href="https://chat.openai.com/" target="_blank" class="platform-link">🔗 ChatGPT (OLD)</a>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="c1">
+                            <label for="c1">F12 → Console shows "ChatGPT content script loaded"</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="c2">
+                            <label for="c2">Purple button appears below AI response</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="c3">
+                            <label for="c3">Click button → GPTZero tab opens</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="c4">
+                            <label for="c4">Results modal shows percentage</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-card">
+                    <h3>2. Gemini <span class="status-badge priority-medium">TEST SECOND</span></h3>
+                    <a href="https://gemini.google.com/app" target="_blank" class="platform-link">🔗 Open Gemini</a>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="g1">
+                            <label for="g1">Script loads + button appears</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="g2">
+                            <label for="g2">Full workflow works</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-card">
+                    <h3>3. Claude</h3>
+                    <a href="https://claude.ai/" target="_blank" class="platform-link">🔗 Open Claude</a>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="cl1">
+                            <label for="cl1">Button only on Claude responses</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="platform-card">
+                    <h3>4. GPTZero <span class="status-badge priority-high">CRITICAL</span></h3>
+                    <a href="https://gptzero.me/" target="_blank" class="platform-link">🔗 Open GPTZero</a>
+                    <div class="checklist">
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="gz1">
+                            <label for="gz1">Text auto-pastes + submits</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" class="checkbox" id="gz2">
+                            <label for="gz2">Results extracted</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🔧 Diagnostic Commands (Console)</h2>
+                <p><strong>Check ChatGPT messages:</strong></p>
+                <div class="code-block">document.querySelectorAll('[data-message-author-role="assistant"]').length</div>
+
+                <p><strong>Check buttons:</strong></p>
+                <div class="code-block">document.querySelectorAll('.fast-gptzero-button').length</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.checkbox').forEach(cb => {
+            cb.addEventListener('change', function() {
+                localStorage.setItem(this.id, this.checked);
+            });
+            const saved = localStorage.getItem(cb.id);
+            if (saved === 'true') cb.checked = true;
+        });
+    </script>
+</body>
+</html>
