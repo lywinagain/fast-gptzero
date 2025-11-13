@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Fast GPTZero",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Automatically check AI responses with GPTZero and get revision suggestions",
   "permissions": [
     "activeTab",
@@ -18,41 +18,41 @@
     "https://gptzero.me/*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "src/background/service-worker.js"
   },
   "content_scripts": [
     {
       "matches": ["https://chat.openai.com/*"],
-      "js": ["content-chatgpt.js"],
-      "css": ["styles.css"],
+      "js": ["src/content/platforms/chatgpt.js"],
+      "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://claude.ai/*"],
-      "js": ["content-claude.js"],
-      "css": ["styles.css"],
+      "js": ["src/content/platforms/claude.js"],
+      "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://gemini.google.com/*"],
-      "js": ["content-gemini.js"],
-      "css": ["styles.css"],
+      "js": ["src/content/platforms/gemini.js"],
+      "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://grok.x.com/*", "https://x.com/*"],
-      "js": ["content-grok.js"],
-      "css": ["styles.css"],
+      "js": ["src/content/platforms/grok.js"],
+      "css": ["src/styles/content.css"],
       "run_at": "document_idle"
     },
     {
       "matches": ["https://gptzero.me/*"],
-      "js": ["content-gptzero.js"],
+      "js": ["src/content/gptzero.js"],
       "run_at": "document_idle"
     }
   ],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup/popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",

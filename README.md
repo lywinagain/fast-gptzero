@@ -29,13 +29,24 @@ cd fast-gptzero
 
 Or download as ZIP and extract.
 
-### Step 2: Create Icons (Required)
+### Step 2: Load Extension (Placeholder icons included!)
 
-The extension needs icon files to work. Choose one of these methods:
+The repository now includes placeholder icons, so you can start testing immediately:
+
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode" (toggle in top-right)
+3. Click "Load unpacked"
+4. Select the `fast-gptzero` directory
+5. Extension is ready to use!
+
+**Optional: Create Better Icons**
+
+If you want proper icons instead of placeholders:
 
 #### Option A: Using the provided script (requires ImageMagick or Inkscape)
 
 ```bash
+cd scripts
 ./create-icons.sh
 ```
 
@@ -61,13 +72,15 @@ convert -size 48x48 xc:'#667eea' icons/icon48.png
 convert -size 128x128 xc:'#667eea' icons/icon128.png
 ```
 
-### Step 3: Load Extension in Chrome
+## 🧪 Testing & Debugging
 
-1. Open Chrome and navigate to `chrome://extensions/`
-2. Enable "Developer mode" (toggle in top right)
-3. Click "Load unpacked"
-4. Select the `fast-gptzero` directory
-5. The extension should now appear in your extensions list!
+For comprehensive testing instructions, platform-specific debugging tips, and troubleshooting help, see **[TESTING.md](TESTING.md)**.
+
+Quick test:
+1. Load the extension
+2. Visit chat.openai.com
+3. Get a response from ChatGPT
+4. Look for "Check with GPTZero" button below the response
 
 ## 📖 Usage
 
@@ -124,17 +137,27 @@ The modal displays:
 
 ```
 fast-gptzero/
-├── manifest.json           # Extension configuration
-├── background.js           # Service worker (orchestrates automation)
-├── content-chatgpt.js     # ChatGPT integration
-├── content-claude.js      # Claude integration
-├── content-gemini.js      # Gemini integration
-├── content-grok.js        # Grok integration
-├── content-gptzero.js     # GPTZero automation
-├── styles.css             # Shared styles
-├── popup.html             # Extension popup UI
-├── popup.js               # Popup functionality
-└── icons/                 # Extension icons
+├── manifest.json                    # Extension configuration
+├── src/
+│   ├── background/
+│   │   └── service-worker.js       # Service worker (orchestrates automation)
+│   ├── content/
+│   │   ├── platforms/
+│   │   │   ├── chatgpt.js         # ChatGPT integration
+│   │   │   ├── claude.js          # Claude integration
+│   │   │   ├── gemini.js          # Gemini integration
+│   │   │   └── grok.js            # Grok integration
+│   │   └── gptzero.js             # GPTZero automation
+│   ├── popup/
+│   │   ├── popup.html             # Extension popup UI
+│   │   └── popup.js               # Popup functionality
+│   └── styles/
+│       └── content.css            # Shared styles
+├── icons/                          # Extension icons
+├── scripts/
+│   └── create-icons.sh           # Icon generation script
+├── TESTING.md                     # Comprehensive testing guide
+└── README.md                      # This file
 ```
 
 ### How the Automation Works
